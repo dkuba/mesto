@@ -6,6 +6,9 @@
   position: relative;
   box-sizing: border-box;
   padding: 34px 36px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 @media screen and (max-width: 540px) {

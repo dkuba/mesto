@@ -1,0 +1,10 @@
+.popup__register-link {
+    margin-top: 10px;
+    color: black;
+    align-self: flex-end;
+}
+
+.popup__register-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
