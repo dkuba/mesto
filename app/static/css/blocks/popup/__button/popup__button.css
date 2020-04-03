@@ -7,11 +7,3 @@
   font-size: 36px;
 }
 
-.popup__button_login {
-  font-size: 32px;
-}
-
-.popup__button_login:hover {
-  color: #000000;
-  border-color: #000000;
-}

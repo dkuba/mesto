@@ -42,16 +42,33 @@
       <div class="popup__content">
         <h3 class="popup__title popup__title_login">Вход</h3>
 
-        <form class="popup__form" name="login">
-            <input type="text" name="username" class="popup__input popup__input_type_name" placeholder="Имя пользователя">
-            <input type="password" name="password" class="popup__input popup__input_type_link-url" placeholder="пароль">
+        <form class="popup__form" name="login" method="post">
+            <input type="text" name="signin_username" class="popup__input" placeholder="Имя пользователя">
+            <input type="password" name="password" class="popup__input" placeholder="пароль">
             <div class="popup__buttons-frame">
-              <button type class="button popup__button popup__button_login">Войти</button>
+              <button type="button" id="button_login" class="button popup__button-login">Войти</button>
             </div>
         </form>
-        <p class="popup__register-link">Регистрация</p>
+        <p id="create_account_link" class="popup__link">Создать аккаунт</p>
       </div>
     </div>
+
+      <div id="signup_menu" class="popup" >
+          <div class="popup__content">
+            <h3 class="popup__title popup__title_signup">Новый пользователь</h3>
+
+            <form class="popup__form" name="signup_form">
+                <input type="text" name="signup_username" class="popup__input" placeholder="Имя пользователя">
+                <input type="password" name="password_first" class="popup__input" autocomplete="off" placeholder="пароль">
+                <input type="password" name="password_second" class="popup__input" autocomplete="off" placeholder="пароль еще раз">
+                <h3 id="wrong_password_message" class="popup__title popup__title-message"></h3>
+                <div class="popup__buttons-frame">
+                  <button id="register_link" class="button popup__button-login">Регистраиця</button>
+                </div>
+            </form>
+              <p id="back_to_signup_link" class="popup__link"><-назад к входу</p>
+          </div>
+      </div>
 
   </div>
 </body>

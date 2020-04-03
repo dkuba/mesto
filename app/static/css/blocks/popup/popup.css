@@ -4,9 +4,13 @@
 @import url(./__form/popup__form.css);
 @import url(./__input/popup__input.css);
 @import url(./__button/popup__button.css);
+@import url(./__button-login/popup__button-login.css);
 @import url(./_is-opened/popup_is-opened.css);
 @import url(./__buttons-frame/popup__buttons-frame.css);
-@import url(./__register-link/popup__register-link.css);
+@import url(__register-link/popup__link.css);
+@import url(./__title/_login/popup__title_login.css);
+@import url(./__title/_signup/popup__title_signup.css);
+@import url(./__title-message/popup__title-message.css);
 
 .popup {
   position: fixed;
