@@ -1,3 +1,5 @@
+import time
+
 from flask import render_template, jsonify, request, json
 from app import app
 
@@ -38,6 +40,7 @@ def register_new_user():
 
 @app.route('/api/check_username', methods=['POST'])
 def is_username_exist():
-    response = {'is_username_exist': False}
-    print('проверка имени пользователя', request.get_json()['username'])
-    return jsonify(response)
+    username_requested = request.get_data(as_text=True)
+    result = User.query.filter(User.username == username_requested).all()
+    print('пользователь существует?', bool(result))
+    return json.dumps(bool(result))

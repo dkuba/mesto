@@ -20,7 +20,7 @@ function set_bindings(){
 
     $('form[name="signup_form"]').submit(function(event){
         event.preventDefault();
-        register_form_validation();
+        username_validation();
     });
 
     $("input[name='password_second']").click(function () {
@@ -32,6 +32,9 @@ function set_bindings(){
     $("input[name='password_first']").click(function () {
         clear_input_borders();
     });
+    $("input[name='signup_email']").click(function () {
+        clear_input_borders();
+    });
 
 }
 
@@ -39,22 +42,27 @@ function clear_input_borders(){
     $("input[name='signup_username']").css("border", "none");
     $("input[name='password_first']").css("border", "none");
     $("input[name='password_second']").css("border", "none");
+    $("input[name='signup_email']").css("border", "none");
     $("#wrong_password_message").css("visibility", "hidden");
 }
 
-function register_form_validation(){
+function username_validation(){
+    set_waiting_spinner_on();
     const signup_username = $("input[name='signup_username']").val();
-    console.log('signup_username', signup_username, '!');
-    let password_first = $("input[name='password_first']").val();
-    const password_second = $("input[name='password_second']").val();
-    console.log("signup_username", signup_username);
-    console.log("password_first", password_first);
-
     if(signup_username === ""){
         set_signup_warning_message("signup_username","введите имя пользователя");
+        return;
     }
-    else if(!is_user_name_exist(signup_username)){
-        alert("name exists already!");
+    is_user_name_exist_request(signup_username);
+}
+
+function register_form_validation(){
+    const email = $("input[name='signup_email']").val()
+    const password_first = $("input[name='password_first']").val();
+    const password_second = $("input[name='password_second']").val();
+
+    if (!email_is_valid(email)){
+        set_signup_warning_message("signup_email","некорректный e-mail");
     }
     else if( password_first !== password_second){
         set_signup_warning_message("password_second","пароли не совпадают");
@@ -66,8 +74,17 @@ function register_form_validation(){
         set_signup_warning_message("password_second","введите пароль");
     }
     else{
-        alert("пароли совпали!");
+        register_new_user();
     }
+}
+
+function register_new_user(){
+    console.log('регистрация нового пользователя');
+}
+
+function email_is_valid(email){
+    return /^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(email)
+        && /^(?=.{1,64}@.{4,64}$)(?=.{6,100}$).*/.test(email);
 }
 
 function set_signup_warning_message(input_name, warning_message){
@@ -76,22 +93,28 @@ function set_signup_warning_message(input_name, warning_message){
     $("#wrong_password_message").css("visibility", "visible");
 }
 
-function is_user_name_exist(username){
+function is_user_name_exist_request(username){
     $.ajax({
         type: "POST",
         url: "/api/check_username",
-        data: JSON.stringify({username: username}),
-        contentType: 'application/json; charset=utf-8',
-        dataType: 'json',
-        success: function (result){
-            console.log(result['is_username_exist']);
-            return true;
-        },
-
-        error: function(error) {
-            console.log(error);
+        data: username,
+        dataType: 'text',
+        success: function (response) {
+            set_waiting_spinner_off();
+            if(response === 'false'){
+                register_form_validation();
+                }
+            else if(response === 'true'){
+                set_signup_warning_message("signup_username","Пользователь с таким именем существует");
+                return true;
+                }
+            else {
+                alert('Нераспознанный ответ сервера!');
+            }
         }
-    });
+
+});
+
 }
 
 function init_current_user() {
@@ -142,4 +165,14 @@ function show_signup_menu(){
 
 function hide_signup_menu(){
     $("#signup_menu").css("display", "none");
+}
+
+function set_waiting_spinner_on(){
+    console.log('включаем спиннер');
+    $("#waiting_spinner").css("display", "flex");
+}
+
+function set_waiting_spinner_off(){
+    console.log('выключаем спиннер');
+    $("#waiting_spinner").css("display", "none");
 }

@@ -59,6 +59,7 @@
 
             <form class="popup__form" name="signup_form">
                 <input type="text" name="signup_username" class="popup__input" placeholder="Имя пользователя">
+                <input type="email" name="signup_email" class="popup__input" placeholder="e-mail">
                 <input type="password" name="password_first" class="popup__input" autocomplete="off" placeholder="пароль">
                 <input type="password" name="password_second" class="popup__input" autocomplete="off" placeholder="пароль еще раз">
                 <h3 id="wrong_password_message" class="popup__title popup__title-message"></h3>
@@ -68,6 +69,10 @@
             </form>
               <p id="back_to_signup_link" class="popup__link"><-назад к входу</p>
           </div>
+      </div>
+
+      <div id="waiting_spinner" class="popup-waiting">
+        <div class="popup-waiting__spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
 
   </div>

@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
-flask_env_path = os.path.join(os.path.dirname(__file__), '.flask_env')
-load_dotenv(flask_env_path)
-
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+load_dotenv('.flaskenv')
+
+
 
 
 class Config(object):
