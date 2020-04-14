@@ -1,7 +1,7 @@
 import time
 
 from flask import render_template, jsonify, request, json
-from app import app
+from app import app, db
 
 from flask_login import current_user, login_user
 from app.models import User
@@ -30,7 +30,9 @@ def get_current_user():
 
 @app.route('/api/login', methods=['POST'])
 def login():
-    print(request)
+    login_data = json.loads(request.get_data(as_text=True))
+    print('login_data:', login_data)
+    return json.dumps(bool(True))
 
 
 @app.route('/api/register', methods=['POST'])
@@ -44,3 +46,18 @@ def is_username_exist():
     result = User.query.filter(User.username == username_requested).all()
     print('пользователь существует?', bool(result))
     return json.dumps(bool(result))
+
+
+@app.route('/api/new_user_registration', methods=['POST'])
+def new_user_registration():
+    user_form = json.loads(json.dumps(request.form))
+    print('new_user_data:', user_form)
+    try:
+        new_user = User(username=user_form['signup_username'], email=user_form['signup_email'])
+        new_user.set_password(user_form['password_first'])
+        db.session.add(new_user)
+        db.session.commit()
+    except:
+        return json.dumps(bool(False))
+    return json.dumps(bool(True))
+

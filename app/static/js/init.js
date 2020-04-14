@@ -7,16 +7,19 @@ $(document).ready(function(){
 function set_bindings(){
 
     $("#create_account_link").click(function () {
-        hide_login_menu();
         show_signup_menu();
         }
     );
 
     $("#back_to_signup_link").click(function (){
-        hide_signup_menu();
         show_login_menu();
         }
     );
+
+    $('#button_login').click(function(event){
+        console.log('логин')
+        user_login($("input[name='sign_in_username']").val(),  $("input[name='sign_in_password']").val());
+    });
 
     $('form[name="signup_form"]').submit(function(event){
         event.preventDefault();
@@ -79,7 +82,54 @@ function register_form_validation(){
 }
 
 function register_new_user(){
-    console.log('регистрация нового пользователя');
+    set_waiting_spinner_on();
+    register_new_user_request();
+}
+
+function register_new_user_request() {
+    $.ajax({
+        type: "POST",
+        url: "/api/new_user_registration",
+        data: $('form[name="signup_form"]').serialize(),
+        dataType: 'json',
+        success: function (response) {
+                if(response === 'false'){
+                    alert('Ошибка регистрации пользователя');
+                    show_signup_menu();
+                }else{
+                    user_login();
+                }
+
+        },
+        error: function(error) {
+            console.log(error);
+        }
+
+});
+}
+
+function user_login(username, password){
+    let loginData = {usr_name: username, pw: password }
+    $.ajax({
+        type: "POST",
+        url: "/api/login",
+        data: JSON.stringify(loginData),
+        dataType: 'json',
+        success: function (response) {
+                if(response === 'false'){
+                    alert('Ошибка входа');
+                    show_login_menu();
+                }else{
+                    alert('Вход выполнен');
+
+                }
+
+        },
+        error: function(error) {
+            console.log(error);
+        }
+});
+
 }
 
 function email_is_valid(email){
@@ -111,6 +161,9 @@ function is_user_name_exist_request(username){
             else {
                 alert('Нераспознанный ответ сервера!');
             }
+        },
+        error: function(error) {
+            console.log(error);
         }
 
 });
@@ -118,20 +171,21 @@ function is_user_name_exist_request(username){
 }
 
 function init_current_user() {
+    set_waiting_spinner_on();
     $.ajax({
         type: "GET",
         url: "/api/current_user",
         success: function(current_user) {
-
-        if (current_user.name == ''){
-              clear_user_view();
-              show_login_menu();
-        }
-        else{
-            hide_login_menu();
-            set_user_view(current_user);
-        }
-        },
+                set_waiting_spinner_off();
+                if (current_user.name == ''){
+                      clear_user_view();
+                      show_login_menu();
+                }
+                else{
+                    hide_login_menu();
+                    set_user_view(current_user);
+                }
+                },
 
         error: function(error) {
             console.log(error);
@@ -152,6 +206,8 @@ function set_user_view(user_info){
 }
 
 function show_login_menu() {
+    set_waiting_spinner_off();
+    hide_signup_menu();
     $("#login_menu").css("display", "flex");
 }
 
@@ -160,6 +216,8 @@ function hide_login_menu() {
 }
 
 function show_signup_menu(){
+    set_waiting_spinner_off();
+    hide_login_menu();
     $("#signup_menu").css("display", "flex");
 }
 
@@ -168,7 +226,6 @@ function hide_signup_menu(){
 }
 
 function set_waiting_spinner_on(){
-    console.log('включаем спиннер');
     $("#waiting_spinner").css("display", "flex");
 }
 

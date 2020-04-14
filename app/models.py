@@ -35,6 +35,7 @@ class Image(db.Model):
     def __repr__(self):
         return '<Image {}>'.format(self.name)
 
+
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
