@@ -11,6 +11,7 @@
 @import url(./__title/_login/popup__title_login.css);
 @import url(./__title/_signup/popup__title_signup.css);
 @import url(./__title-message/popup__title-message.css);
+@import url(./__checkbox/popup__checkbox.css);
 
 .popup {
   position: fixed;

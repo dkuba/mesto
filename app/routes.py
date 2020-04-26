@@ -9,6 +9,7 @@ from app.models import User
 
 @app.route('/')
 @app.route('/index')
+@app.route('/null')
 def index():
     return render_template('index.html')
 
@@ -31,20 +32,17 @@ def get_current_user():
 @app.route('/api/login', methods=['POST'])
 def login():
     login_data = json.loads(request.get_data(as_text=True))
-    print('login_data:', login_data)
+    user = User.query.filter_by(username=login_data['user_name']).first()
+    if user is None or not user.check_password(login_data['password']):
+        return json.dumps(bool(False))
+    login_user(user, remember=login_data['remember'])
     return json.dumps(bool(True))
-
-
-@app.route('/api/register', methods=['POST'])
-def register_new_user():
-    print(request)
 
 
 @app.route('/api/check_username', methods=['POST'])
 def is_username_exist():
     username_requested = request.get_data(as_text=True)
     result = User.query.filter(User.username == username_requested).all()
-    print('пользователь существует?', bool(result))
     return json.dumps(bool(result))
 
 

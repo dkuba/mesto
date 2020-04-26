@@ -17,8 +17,7 @@ function set_bindings(){
     );
 
     $('#button_login').click(function(event){
-        console.log('логин')
-        user_login($("input[name='sign_in_username']").val(),  $("input[name='sign_in_password']").val());
+        user_sign_in();
     });
 
     $('form[name="signup_form"]').submit(function(event){
@@ -29,14 +28,25 @@ function set_bindings(){
     $("input[name='password_second']").click(function () {
         clear_input_borders();
     });
+
     $("input[name='signup_username']").click(function () {
         clear_input_borders();
     });
+
     $("input[name='password_first']").click(function () {
         clear_input_borders();
     });
+
     $("input[name='signup_email']").click(function () {
         clear_input_borders();
+    });
+
+    $("input[name='sign_in_username']").click(function () {
+        clear_sign_in_input_borders();
+    });
+
+    $("input[name='sign_in_password']").click(function () {
+        clear_sign_in_input_borders();
     });
 
 }
@@ -49,11 +59,36 @@ function clear_input_borders(){
     $("#wrong_password_message").css("visibility", "hidden");
 }
 
+function clear_sign_in_input_borders(){
+    $("input[name='sign_in_username']").css("border", "none");
+    $("input[name='sign_in_password']").css("border", "none");
+    $("#sign_in_error_message").css("visibility", "hidden");
+}
+
+function user_sign_in(){
+    set_waiting_spinner_on();
+    const sign_in_username = $("input[name='sign_in_username']").val();
+    const sign_in_password = $("input[name='sign_in_password']").val();
+    const remember_me = $('#remember_me_checkbox').prop('checked');
+    if (sign_in_username == ""){
+        set_sign_in_error_message("sign_in_username", "введите имя пользователя");
+        set_waiting_spinner_off();
+    }
+    else if(sign_in_password == ""){
+        set_sign_in_error_message("sign_in_password", "введите пароль");
+        set_waiting_spinner_off();
+    }
+    else{
+        user_login(sign_in_username, sign_in_password, false, remember_me);
+    }
+}
+
 function username_validation(){
     set_waiting_spinner_on();
     const signup_username = $("input[name='signup_username']").val();
     if(signup_username === ""){
-        set_signup_warning_message("signup_username","введите имя пользователя");
+        set_signup_warning_message("signup_username", "введите имя пользователя");
+        set_waiting_spinner_off();
         return;
     }
     is_user_name_exist_request(signup_username);
@@ -97,7 +132,7 @@ function register_new_user_request() {
                     alert('Ошибка регистрации пользователя');
                     show_signup_menu();
                 }else{
-                    user_login();
+                    user_login( $("input[name='signup_username']").val(), $("input[name='password_first']").val(), true);
                 }
 
         },
@@ -108,20 +143,29 @@ function register_new_user_request() {
 });
 }
 
-function user_login(username, password){
-    let loginData = {usr_name: username, pw: password }
+
+
+function user_login(username, password, new_user=false, remember_me_status=false){
+    let loginData = {user_name: username, password: password, remember: remember_me_status }
     $.ajax({
         type: "POST",
         url: "/api/login",
         data: JSON.stringify(loginData),
         dataType: 'json',
         success: function (response) {
-                if(response === 'false'){
-                    alert('Ошибка входа');
+                set_waiting_spinner_off();
+                console.log(response)
+                if(response == false){
+                    console.log('new_user', new_user)
+                    if (new_user==false){
+                        set_sign_in_error_message("", "неверное имя пользователя или пароль")
+                    }else{
+                        alert('Регистрация прошла успешно, но произошла ошибка входа');
+                    }
                     show_login_menu();
                 }else{
                     alert('Вход выполнен');
-
+                    init_current_user();
                 }
 
         },
@@ -131,6 +175,12 @@ function user_login(username, password){
 });
 
 }
+
+function show_page_for_user(){
+
+}
+
+
 
 function email_is_valid(email){
     return /^[a-z0-9]+([-._][a-z0-9]+)*@([a-z0-9]+(-[a-z0-9]+)*\.)+[a-z]{2,4}$/.test(email)
@@ -143,6 +193,14 @@ function set_signup_warning_message(input_name, warning_message){
     $("#wrong_password_message").css("visibility", "visible");
 }
 
+function set_sign_in_error_message(input_name="", error_message){
+    if (input_name != ""){
+        $(`input[name='${input_name}']`).css("border", "2px solid darkred");
+    }
+    $("#sign_in_error_message").html(error_message);
+    $("#sign_in_error_message").css("visibility", "visible");
+}
+
 function is_user_name_exist_request(username){
     $.ajax({
         type: "POST",
@@ -150,6 +208,7 @@ function is_user_name_exist_request(username){
         data: username,
         dataType: 'text',
         success: function (response) {
+            set_waiting_spinner_off();
             set_waiting_spinner_off();
             if(response === 'false'){
                 register_form_validation();
@@ -159,11 +218,12 @@ function is_user_name_exist_request(username){
                 return true;
                 }
             else {
-                alert('Нераспознанный ответ сервера!');
+                alert('Нераспознанный ответ сервера при проверке имени пользователя!');
             }
         },
         error: function(error) {
             console.log(error);
+            set_waiting_spinner_off();
         }
 
 });
@@ -172,17 +232,20 @@ function is_user_name_exist_request(username){
 
 function init_current_user() {
     set_waiting_spinner_on();
+    console.log('init_current_user');
     $.ajax({
         type: "GET",
         url: "/api/current_user",
         success: function(current_user) {
                 set_waiting_spinner_off();
+                console.log(current_user);
                 if (current_user.name == ''){
                       clear_user_view();
                       show_login_menu();
                 }
                 else{
                     hide_login_menu();
+                    hide_signup_menu();
                     set_user_view(current_user);
                 }
                 },
