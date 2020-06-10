@@ -1,9 +1,9 @@
 import time
 
-from flask import render_template, jsonify, request, json
+from flask import render_template, jsonify, request, json, abort
 from app import app, db
 
-from flask_login import current_user, login_user
+from flask_login import current_user, login_user, logout_user
 from app.models import User
 
 
@@ -58,4 +58,13 @@ def new_user_registration():
     except:
         return json.dumps(bool(False))
     return json.dumps(bool(True))
+
+
+@app.route('/api/logout', methods=['GET'])
+def logout():
+    try:
+        logout_user()
+        return json.dumps(bool(True))
+    except:
+        abort(500)
 

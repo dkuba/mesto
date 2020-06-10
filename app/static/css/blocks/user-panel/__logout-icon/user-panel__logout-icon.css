@@ -1,0 +1,11 @@
+
+.user-panel__logout-icon {
+    background-image: url('../../../../images/logout.png');
+    width: 27px;
+    height: 27px;
+}
+
+.user-panel__logout-icon:hover {
+    opacity: 0.5;
+    cursor: pointer;
+}

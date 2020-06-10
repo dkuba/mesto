@@ -1,0 +1,7 @@
+@import url(__logout-icon/user-panel__logout-icon.css);
+
+.user-panel {
+    margin-bottom: -75px;
+    flex-direction: row;
+    display: none;
+}

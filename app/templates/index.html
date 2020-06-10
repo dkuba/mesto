@@ -12,28 +12,33 @@
 <body>
   <div class="root">
     <header class="header root__section">
-      <img src="../static/images/logo.svg" alt="mesto logo" class="logo">
+        <img src="../static/images/logo.svg" alt="mesto logo" class="logo">
+        <div class="user-panel">
+            <div class="user-panel__logout-icon"></div>
+        </div>
     </header>
     <div class="profile root__section">
       <div class="user-info">
         <div class="user-info__photo"></div>
         <div class="user-info__data">
           <h1 class="user-info__name"></h1>
-          <p class="user-info__job">Sailor, Researcher</p>
+          <p class="user-info__job">пользователь</p>
         </div>
-        <button class="button user-info__button">+</button>
+        <button id="add_photo_button" class="button user-info__button">+</button>
       </div>
     </div>
     <div class="places-list root__section">
     </div>
-    <div class="popup">
+
+    <div id="add_photo_menu" class="popup">
       <div class="popup__content">
-        <img src="../static/images/close.svg" alt="" class="popup__close">
+        <img id="close_new_image_form" src="../static/images/close.svg" alt="" class="popup__close">
         <h3 class="popup__title">Новое место</h3>
         <form class="popup__form" name="new_image">
-            <input type="text" name="name" class="popup__input popup__input_type_name" placeholder="Название">
-            <input type="text" name="link" class="popup__input popup__input_type_link-url" placeholder="Ссылка на картинку">
-            <button type class="button popup__button">+</button>
+            <input type="text" name="image_name" class="popup__input" placeholder="Название">
+            <input type="text" name="image_link" class="popup__input" placeholder="Ссылка на картинку">
+            <h3 id="new_image_form_warning_message" class="popup__title popup__title-message"></h3>
+            <button id="add_photo" type class="button popup__button">+</button>
         </form>
       </div>
     </div>

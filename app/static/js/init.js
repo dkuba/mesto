@@ -26,19 +26,19 @@ function set_bindings(){
     });
 
     $("input[name='password_second']").click(function () {
-        clear_input_borders();
+        clear_sign_up_borders();
     });
 
     $("input[name='signup_username']").click(function () {
-        clear_input_borders();
+        clear_sign_up_borders();
     });
 
     $("input[name='password_first']").click(function () {
-        clear_input_borders();
+        clear_sign_up_borders();
     });
 
     $("input[name='signup_email']").click(function () {
-        clear_input_borders();
+        clear_sign_up_borders();
     });
 
     $("input[name='sign_in_username']").click(function () {
@@ -49,9 +49,52 @@ function set_bindings(){
         clear_sign_in_input_borders();
     });
 
+    $('#add_photo_button').click(function () {
+        show_add_photo_menu();
+    });
+
+    $('#close_new_image_form').click(function () {
+        hide_add_photo_menu();
+    });
+
+    $('form[name="new_image"]').submit(function(event){
+        event.preventDefault();
+        add_new_photo();
+    });
+
+    $("input[name='image_name']").click(function () {
+        clear_new_image_form_input_borders();
+    });
+
+    $("input[name='image_link']").click(function () {
+        clear_new_image_form_input_borders();
+    });
+
+    $('.user-panel__logout-icon').click(function () {
+        logout();
+    })
+
 }
 
-function clear_input_borders(){
+function logout() {
+    set_waiting_spinner_on();
+    $.ajax({
+        type: "GET",
+        url: "/api/logout",
+        success: function () {
+                    set_waiting_spinner_off();
+                    hide_user_panel();
+                    clear_user_view();
+                    show_login_menu();
+        },
+        error: function(error) {
+            set_waiting_spinner_off();
+            alert(`Ошибка на сайте: ${error.status}`)
+        }
+});
+}
+
+function clear_sign_up_borders(){
     $("input[name='signup_username']").css("border", "none");
     $("input[name='password_first']").css("border", "none");
     $("input[name='password_second']").css("border", "none");
@@ -98,11 +141,10 @@ function register_form_validation(){
     const email = $("input[name='signup_email']").val()
     const password_first = $("input[name='password_first']").val();
     const password_second = $("input[name='password_second']").val();
-
     if (!email_is_valid(email)){
         set_signup_warning_message("signup_email","некорректный e-mail");
     }
-    else if( password_first !== password_second){
+    else if(password_first !== password_second){
         set_signup_warning_message("password_second","пароли не совпадают");
     }
     else if(password_first === ""){
@@ -144,9 +186,8 @@ function register_new_user_request() {
 }
 
 
-
 function user_login(username, password, new_user=false, remember_me_status=false){
-    let loginData = {user_name: username, password: password, remember: remember_me_status }
+    let loginData = {user_name: username, password: password, remember: remember_me_status };
     $.ajax({
         type: "POST",
         url: "/api/login",
@@ -164,22 +205,17 @@ function user_login(username, password, new_user=false, remember_me_status=false
                     }
                     show_login_menu();
                 }else{
-                    alert('Вход выполнен');
                     init_current_user();
                 }
 
         },
         error: function(error) {
-            console.log(error);
+            handleAjaxError(error)
+            set_waiting_spinner_off();
         }
 });
 
 }
-
-function show_page_for_user(){
-
-}
-
 
 
 function email_is_valid(email){
@@ -209,7 +245,6 @@ function is_user_name_exist_request(username){
         dataType: 'text',
         success: function (response) {
             set_waiting_spinner_off();
-            set_waiting_spinner_off();
             if(response === 'false'){
                 register_form_validation();
                 }
@@ -222,7 +257,7 @@ function is_user_name_exist_request(username){
             }
         },
         error: function(error) {
-            console.log(error);
+            handleAjaxError();
             set_waiting_spinner_off();
         }
 
@@ -260,12 +295,30 @@ function clear_user_view(){
     $(".user-info").hide();
 }
 
-function set_user_view(user_info){
+function set_user_view(user_info=undefined){
     $(".user-info").show();
     $(".user-info__name").html(user_info.name);
-    if(user_info.avatar_url != ''){
-        $(".user-info__photo").css("background-image", `url('${user_info.avatar_url}'`);
+    console.log(user_info);
+    if(user_info.avatar_url !== null){
+        $(".user-info__photo").css("background-image", `url('${user_info.avatar_url}')`);
     }
+    show_user_panel();
+}
+
+function show_user_cards() {
+    get_cards_request()
+}
+
+function get_cards_request(){
+
+}
+
+function show_user_panel(){
+    $(".user-panel").css("display", "flex");
+}
+
+function hide_user_panel(){
+    $(".user-panel").css("display", "none");
 }
 
 function show_login_menu() {
@@ -275,6 +328,8 @@ function show_login_menu() {
 }
 
 function hide_login_menu() {
+    $("input[name='sign_in_username']").val('');
+    $("input[name='sign_in_password']").val('');
     $("#login_menu").css("display", "none");
 }
 
@@ -293,6 +348,74 @@ function set_waiting_spinner_on(){
 }
 
 function set_waiting_spinner_off(){
-    console.log('выключаем спиннер');
     $("#waiting_spinner").css("display", "none");
+}
+
+
+
+function show_add_photo_menu(){
+    $("#add_photo_menu").css("display", "flex");
+}
+
+function hide_add_photo_menu(){
+    $("#add_photo_menu").css("display", "none");
+}
+
+function add_new_photo() {
+    new_image_form_validation();
+    const image_name = $("input[name='image_name']").val();
+    const image_link = $("input[name='image_name']").val();
+    add_new_image_request(image_name, image_link);
+}
+
+function add_new_image_request(name, link) {
+    $.ajax({
+        type: "POST",
+        url: "/api/new_user_registration",
+        data: $('form[name="new_image"]').serialize(),
+        dataType: 'json',
+        success: function (response) {
+                if(response === 'false'){
+                    alert('Ошибка регистрации пользователя');
+                    show_signup_menu();
+                }else{
+                    user_login( $("input[name='signup_username']").val(), $("input[name='password_first']").val(), true);
+                }
+
+        },
+        error: function(error) {
+            console.log(error);
+        }
+
+});
+}
+
+function new_image_form_validation(){
+    const image_name = $("input[name='image_name']").val();
+    const image_link = $("input[name='image_link']").val();
+    if(image_name === ""){
+        set_image_form_warning_message("image_name", "имя картинки не может быть пустым");
+        return false;
+    }
+    if(image_link === ""){
+        set_image_form_warning_message("image_link", "ссылка не задана");
+        return false;
+    }
+    return true;
+}
+
+function set_image_form_warning_message(input_name, warning_message){
+    $(`input[name='${input_name}']`).css("border", "2px solid darkred");
+    $("#new_image_form_warning_message").html(warning_message);
+    $("#new_image_form_warning_message").css("visibility", "visible");
+}
+
+function clear_new_image_form_input_borders() {
+    $(`input[name='image_name']`).css("border", "none");
+    $(`input[name='image_link']`).css("border", "none");
+    $("#new_image_form_warning_message").css("visibility", "hidden");
+}
+
+function handleAjaxError(jqXHR, textStatus, errorThrown) {
+    alert(`Ошибка на странице: ${textStatus.status}`)
 }
